@@ -3,34 +3,36 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
-	"encoding/base64"
 )
 
 func main() {
 	encodedString := "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
-	decodedString := XORagainstLetter(encodedString, "X")
-	sDec, _ := base64.StdEncoding.DecodeString(hexToBase64(decodedString))
-	fmt.Println(string(sDec))
 
-}
+	codeA := 65
+	codeX := 88
+	codea := 97
+	codex := 120
 
-func hexToBase64(hexValue string) string {
-	decodedBytes, err := hex.DecodeString(hexValue)
-	if err != nil {
-		fmt.Println("Error", err)
+	for i := codeA; i <= codeX; i++ {
+		xored := XORagainstLetter(encodedString, byte(i))
+		decoded, _ := hex.DecodeString(xored)
+		fmt.Printf("%s\n", decoded)
 	}
 
-	base64Value := base64.StdEncoding.EncodeToString(decodedBytes)
-	return base64Value
+	fmt.Println("\n\nSmall letters \n\n")
+	for i := codea; i <= codex; i++ {
+		xored := XORagainstLetter(encodedString, byte(i))
+		decoded, _ := hex.DecodeString(xored)
+		fmt.Printf("%s\n", decoded)
+	}
 }
 
-func XORagainstLetter(base, cipher string) string {
+func XORagainstLetter(base string, cipher byte) string {
 	var res []byte
 	baseBytes, _ := hex.DecodeString(base)
-	cipherByte := fmt.Sprintf("%s", cipher)
 
 	for i := 0; i < len(baseBytes); i++ {
-		res = append(res, baseBytes[i]^cipherByte[0])
+		res = append(res, baseBytes[i]^cipher)
 	}
 
 	return hex.EncodeToString(res)
