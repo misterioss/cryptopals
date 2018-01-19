@@ -1,36 +1,27 @@
 package main
 
 import (
-	"encoding/hex"
+	"io/ioutil"
+
 	"fmt"
 	"strings"
+	"encoding/hex"
 )
 
 func main() {
-	encodedString := "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736"
+	data, err := ioutil.ReadFile("./set1challenge4.txt")
+	check(err)
+	strs := strings.Split(string(data), "\n");
+	for i := 0; i < len(strs); i++ {
+		s := strs[i]
 
-	codeA := 65
-	codeX := 88
-	codea := 97
-	codex := 120
-
-	checkStrings(encodedString, codeA, codeX, 30)
-	checkStrings(encodedString, codea, codex, 30)
-
+		makeMeHappy(s);
+	}
 }
 
-func checkStrings(s string, from, to int, threshhold float64) {
-	for i := from; i <= to; i++ {
-		xored := XORagainstLetter(s, byte(i))
-		decoded, _ := hex.DecodeString(xored)
-		resultString := fmt.Sprintf("%s", decoded)
-		score := scoreText(resultString)
-		fmt.Println(resultString)
-		if score >= threshhold {
-			fmt.Println(s, score, resultString)
-			fmt.Println(score)
-		}
-		score = 0
+func check(err error) {
+	if err != nil {
+		panic(err)
 	}
 }
 
@@ -45,8 +36,26 @@ func XORagainstLetter(base string, cipher byte) string {
 	return hex.EncodeToString(res)
 }
 
+func makeMeHappy(s string) {
+	checkStrings(s, 13, 88, 10)
+}
+
+func checkStrings(s string, from, to int, threshhold float64) {
+	for i := from; i <= to; i++ {
+		xored := XORagainstLetter(s, byte(i))
+		decoded, _ := hex.DecodeString(xored)
+		resultString := fmt.Sprintf("%s", decoded)
+		score := scoreText(resultString)
+		if score >= threshhold {
+			fmt.Println(s, score, resultString, i)
+			fmt.Println(score)
+		}
+		score = 0
+	}
+}
+
 func scoreText(s string) float64 {
-	sLower := strings.Split(strings.ToUpper(s), "")
+	stringToScore := strings.Split(strings.ToUpper(s), "")
 	totalScore := 0.0
 	letterFrequency := make(map[string]float64)
 	letterFrequency["E"] = 12.02
@@ -75,12 +84,9 @@ func scoreText(s string) float64 {
 	letterFrequency["Q"] = 0.11
 	letterFrequency["J"] = 0.10
 	letterFrequency["Z"] = 0.07
-	letterFrequency["}"] = -100
-	letterFrequency["{"] = -100
-	letterFrequency["*"] = -100
 
-	for i := 0; i < len(sLower); i++ {
-		letter := sLower[i]
+	for i := 0; i < len(stringToScore); i++ {
+		letter := stringToScore[i]
 
 		val, prs := letterFrequency[letter];
 		if (prs) {
